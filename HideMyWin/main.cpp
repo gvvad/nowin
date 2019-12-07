@@ -87,18 +87,23 @@ int __stdcall main() {
 	strInfo.dwFlags |= STARTF_USESHOWWINDOW;
 	strInfo.wShowWindow = cmdShow;
 
-	int res = CreateProcess(
+	if (CreateProcess(
 		exePath, exeAtr,
 		NULL, NULL,
 		FALSE,
 		creationFlags,
 		NULL, NULL,
-		&strInfo, &prcInfo);
+		&strInfo, &prcInfo)
+		)
+	{
+		WaitForSingleObject(prcInfo.hProcess, INFINITE);
 
-	WaitForSingleObject(prcInfo.hProcess, INFINITE);
-
-	GetExitCodeProcess(prcInfo.hProcess, &exitCode);
-	CloseHandle(prcInfo.hProcess);
+		GetExitCodeProcess(prcInfo.hProcess, &exitCode);
+		CloseHandle(prcInfo.hProcess);
+	}
+	else {
+		exitCode = GetLastError();
+	}
 	
 	ExitProcess(exitCode);
 }
